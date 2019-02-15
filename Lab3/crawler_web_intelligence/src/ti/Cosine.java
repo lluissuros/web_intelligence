@@ -24,8 +24,8 @@ public class Cosine implements RetrievalModel
 		// P1
 		// Extract the terms from the query
 		System.out.println(index.documents.size());
-		ArrayList<String> queryTerms = new ArrayList<String>(Arrays.asList(queryText.split(" "))); 
-		
+		ArrayList<String> queryTerms = docProcessor.processText(queryText); 
+	
 		
 		// Calculate the query vector
 			//in process
