@@ -23,7 +23,7 @@ public class Cosine implements RetrievalModel
 	{
 		// P1
 		// Extract the terms from the query
-		System.out.println(index.documents.size());
+		//System.out.println(index.documents.size());
 		ArrayList<String> queryTerms = docProcessor.processText(queryText); 
 	
 		
@@ -81,33 +81,20 @@ public class Cosine implements RetrievalModel
 		
 		Set<String> set = new HashSet<String>(terms);		
 		for (String term : set) {			
-		    //tf: term freq in the query
 			int occurrences = Collections.frequency(terms, term);
 			double termFreq = 1 + Math.log10(occurrences);
-			System.out.println(term + ", term frequency in the query: " + occurrences);
-			
-			//idf: log (1+ nd/ct)
-			int docsNumber = index.documents.size();
-			int docsContainTerm = 0;	
-			double idf = 0;
 			
 			if (index.vocabulary.containsKey(term)){
 				int termID = index.vocabulary.get(term).item1;
-				docsContainTerm = index.invertedIndex.get(termID).size();
-				idf = Math.log10(1+ (docsNumber/docsContainTerm));
-				
-				//weight term = 𝑤 = 𝑡𝑓 · 𝑖𝑑𝑓
+				double idf = index.vocabulary.get(term).item2;
 				double calculatedWeight = termFreq * idf;
 				vector.add(new Tuple<>(termID, calculatedWeight));
-				System.out.println(term + ", docs Containing Term: " + docsContainTerm);
-				System.out.println(term + ", idf: " + idf);	
 			} else {
-				System.out.println(term + " was not found in the docs");
+				//System.out.println(term + " was not found in the docs");
 			}
-			System.out.println(" ");
+			//System.out.println(" ");
 		}
-		
-		System.out.println(vector.size());
+		System.out.println(vector);
 		return vector;
 	}
 }
