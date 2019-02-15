@@ -25,12 +25,9 @@ public class Cosine implements RetrievalModel
 		// Extract the terms from the query
 		//System.out.println(index.documents.size());
 		ArrayList<String> queryTerms = docProcessor.processText(queryText); 
-	
 		
 		// Calculate the query vector
-			//in process
 		ArrayList<Tuple<Integer, Double>> queryVector = this.computeVector(queryTerms, index);
-		
 		
 		// Calculate the document similarity
 		ArrayList<Tuple<Integer, Double>> results = this.computeScores(queryVector, index);
@@ -51,20 +48,20 @@ public class Cosine implements RetrievalModel
 
 		// P1
 		//<docId, similarity>
-		HashMap<Integer, Double> sims = new HashMap<>();
+		HashMap<Integer, Double> tempSimilarities = new HashMap<>();
 		
 		for (Tuple<Integer, Double> term : queryVector) {
 			int termId = term.item1;
 			for (Tuple<Integer, Double> doc :index.invertedIndex.get(termId)) {
-				//get cosine similiaty 
+				//get cosine similarity 
 				double weightInQuery = term.item2;
 				double weightInDoc = doc.item2;
 				double result = weightInQuery * weightInDoc;
-				if(sims.containsKey(doc.item1)) {
-					//accumulate the previous result to sims[docId]
-					sims.put(doc.item1, sims.get(doc.item1) + result);
+				if(tempSimilarities.containsKey(doc.item1)) {
+					//accumulate the previous result to tempSimilarities[docId]
+					tempSimilarities.put(doc.item1, tempSimilarities.get(doc.item1) + result);
 				} else {
-					sims.put(doc.item1, result);
+					tempSimilarities.put(doc.item1, result);
 				}
 			}
 			
@@ -75,10 +72,9 @@ public class Cosine implements RetrievalModel
 			}
 			normQueryWeight = Math.sqrt(normQueryWeight);
 			
-			
-			for (int docId : sims.keySet()) {
+			for (int docId : tempSimilarities.keySet()) {
 				double normDocWeight = index.documents.get(docId).item2;
-				double cosineSim = sims.get(docId)/(normQueryWeight * normDocWeight);
+				double cosineSim = tempSimilarities.get(docId)/(normQueryWeight * normDocWeight);
 				results.add(new Tuple<>(docId, cosineSim));
 			}			
 						
@@ -109,10 +105,6 @@ public class Cosine implements RetrievalModel
 		ArrayList<Tuple<Integer, Double>> vector = new ArrayList<>();
 
 		// P1: compute following the TF.IDF:
-		
-		// term weights in the documents are already in invertedIndex, and their norm (documents)
-		// query weights and their norms should be calculated at query time.
-		
 		Set<String> set = new HashSet<String>(terms);		
 		for (String term : set) {			
 			int occurrences = Collections.frequency(terms, term);
@@ -123,12 +115,8 @@ public class Cosine implements RetrievalModel
 				double idf = index.vocabulary.get(term).item2;
 				double calculatedWeight = termFreq * idf;
 				vector.add(new Tuple<>(termID, calculatedWeight));
-			} else {
-				//System.out.println(term + " was not found in the docs");
 			}
-			//System.out.println(" ");
 		}
-		System.out.println(vector);
 		return vector;
 	}
 }
