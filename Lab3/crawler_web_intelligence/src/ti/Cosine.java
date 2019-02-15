@@ -50,6 +50,40 @@ public class Cosine implements RetrievalModel
 		ArrayList<Tuple<Integer, Double>> results = new ArrayList<>();
 
 		// P1
+		//<docId, similarity>
+		HashMap<Integer, Double> sims = new HashMap<>();
+		
+		for (Tuple<Integer, Double> term : queryVector) {
+			int termId = term.item1;
+			for (Tuple<Integer, Double> doc :index.invertedIndex.get(termId)) {
+				//get cosine similiaty 
+				double weightInQuery = term.item2;
+				double weightInDoc = doc.item2;
+				double result = weightInQuery * weightInDoc;
+				if(sims.containsKey(doc.item1)) {
+					//accumulate the previous result to sims[docId]
+					sims.put(doc.item1, sims.get(doc.item1) + result);
+				} else {
+					sims.put(doc.item1, result);
+				}
+			}
+			
+		
+			double normQueryWeight = 0;
+			for (Tuple<Integer, Double> q :queryVector) {
+				normQueryWeight = normQueryWeight + Math.pow(q.item2, 2);
+			}
+			normQueryWeight = Math.sqrt(normQueryWeight);
+			
+			
+			for (int docId : sims.keySet()) {
+				double normDocWeight = index.documents.get(docId).item2;
+				double cosineSim = sims.get(docId)/(normQueryWeight * normDocWeight);
+				results.add(new Tuple<>(docId, cosineSim));
+			}			
+						
+		}
+		
 
 		// Sort documents by similarity and return the ranking
 		Collections.sort(results, new Comparator<Tuple<Integer, Double>>()
