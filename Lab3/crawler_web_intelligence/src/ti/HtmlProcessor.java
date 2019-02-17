@@ -33,6 +33,7 @@ public class HtmlProcessor implements DocumentProcessor
 	public Tuple<String, String> parse(String html)
 	{
 		// P2
+		// do it with jsoup
 		// Parse document
 
 		return null; // Return title and body separately
@@ -110,6 +111,7 @@ public class HtmlProcessor implements DocumentProcessor
 		String stem = null;
 
 		// P2
+		// use the stemmer java provided in the aulaglobal, or use another one if you want
 
 		return stem;
 	}

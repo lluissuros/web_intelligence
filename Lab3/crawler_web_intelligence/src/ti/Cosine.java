@@ -79,7 +79,7 @@ public class Cosine implements RetrievalModel
 			}			
 						
 		}
-		
+
 
 		// Sort documents by similarity and return the ranking
 		Collections.sort(results, new Comparator<Tuple<Integer, Double>>()
