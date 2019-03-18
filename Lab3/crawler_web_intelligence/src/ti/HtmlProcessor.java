@@ -5,7 +5,18 @@ package ti;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 
 /**
  * A processor to extract terms from HTML documents.
@@ -13,7 +24,8 @@ import java.util.ArrayList;
 public class HtmlProcessor implements DocumentProcessor
 {
 
-	// P2
+	// P2:done?
+	protected HashSet<String> stopwords;
 
 	/**
 	 * Creates a new HTML processor.
@@ -24,7 +36,9 @@ public class HtmlProcessor implements DocumentProcessor
 	public HtmlProcessor(File pathToStopWords) throws IOException
 	{
 		// P2
-		// Load stopwords
+		//TODO: shall we normalize the stopwords as well??
+		List<String> lines = Files.readAllLines(Paths.get(pathToStopWords.toString()), StandardCharsets.UTF_8);
+		this.stopwords = new HashSet<String>(lines);		
 	}
 
 	/**
@@ -32,11 +46,14 @@ public class HtmlProcessor implements DocumentProcessor
 	 */
 	public Tuple<String, String> parse(String html)
 	{
-		// P2
-		// do it with jsoup
-		// Parse document
-
-		return null; // Return title and body separately
+		// P2: done?
+		Document document = Jsoup.parse(html);
+		String title = document.title(); //Get title
+		String body = "";
+		if(document.body() != null){
+			body = document.body().text();
+		}
+		return new Tuple<>(title, body); // Return title and body separately
 	}
 
 	/**
@@ -47,11 +64,46 @@ public class HtmlProcessor implements DocumentProcessor
 	 */
 	public ArrayList<String> processText(String text)
 	{
-		ArrayList<String> terms = new ArrayList<>();
-
+		
 		// P2
-		// Tokenizing, normalizing, stopwords, stemming, etc. 
-
+		// Tokenizing, normalizing, stopwords, stemming, etc.
+		
+		ArrayList<String> terms = new ArrayList<>();
+		
+		//tokenize
+		ArrayList<String> tokens = this.tokenize(text);
+		
+		//normalize
+		ArrayList<String> tokensNorm = new ArrayList<>();
+		for (String token : tokens) {
+			String tokenNorm = this.normalize(token);
+			if(tokenNorm !=null) {
+				tokensNorm.add(tokenNorm);				
+			}
+		}
+		
+		//remove stopwords:
+		ArrayList<String> stopWordsRemoved = new ArrayList<>();
+		for (String tokenNorm : tokensNorm) {
+			if(!this.isStopWord(tokenNorm)) {
+				stopWordsRemoved.add(tokenNorm);				
+			}
+		}
+		
+		/*
+		System.out.println("\n log process");
+		System.out.println(tokens);
+		System.out.println(tokensNorm);
+		System.out.println(stopWordsRemoved); 
+		*/
+		
+		
+		
+		//TODO:stemming
+		
+		
+		terms = stopWordsRemoved;
+	
 		return terms;
 	}
 
@@ -62,10 +114,10 @@ public class HtmlProcessor implements DocumentProcessor
 	 * @return the list of tokens.
 	 */
 	protected ArrayList<String> tokenize(String text)
-	{
-		ArrayList<String> tokens = new ArrayList<>();
-
-		// P2
+	{		
+		// P2: done?	
+		String[] strings = text.replaceAll("[^A-Za-z0-9]", " ").split("\\s+");
+		ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(strings));		
 
 		return tokens;
 	}
@@ -78,12 +130,26 @@ public class HtmlProcessor implements DocumentProcessor
 	 */
 	protected String normalize(String text)
 	{
+		// P2: done?
+		//TODO: not sure if this is really correct
 		String normalized = null;
-
-		// P2
-
+		if(!isNumeric(text)) {
+			String textLower = text.toLowerCase();
+			//normalize and remove ugly unicode:
+			normalized = Normalizer.normalize(textLower, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+		}
 		return normalized;
 	}
+	
+	/**
+	 * Checks whether text is a number.
+	 *
+	 * @param term the term to check.
+	 * @return {@code true} if the term is a number.
+	 */
+	private boolean isNumeric(String s) { 
+	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
+	}  
 
 	/**
 	 * Checks whether the given term is a stopword.
@@ -95,7 +161,10 @@ public class HtmlProcessor implements DocumentProcessor
 	{
 		boolean isTopWord = false;
 
-		// P2
+		// P2: done?
+		if(this.stopwords.contains(term)) {
+			isTopWord = true;
+		}
 
 		return isTopWord;
 	}
