@@ -3,6 +3,8 @@
 
 package ti;
 
+import ti.Stemmer;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -90,23 +92,22 @@ public class HtmlProcessor implements DocumentProcessor
 			}
 		}
 		
+		
+		//stemming with the provided Stemmer.java
+		ArrayList<String> stemmedWords = new ArrayList<>();
+		for (String word : stopWordsRemoved) {
+			stemmedWords.add(this.stem(word));
+		}
+	
 		/*
 		System.out.println("\n log process");
 		System.out.println(tokens);
 		System.out.println(tokensNorm);
 		System.out.println(stopWordsRemoved); 
+		System.out.println(stemmedWords); 
 		*/
 		
-		System.out.println("\n log process:");
-		System.out.println(tokens);
-		System.out.println(tokensNorm);
-		System.out.println(stopWordsRemoved);
-		
-		
-		//TODO:stemming
-		
-		
-		terms = stopWordsRemoved;
+		terms = stemmedWords;
 	
 		return terms;
 	}
@@ -119,7 +120,7 @@ public class HtmlProcessor implements DocumentProcessor
 	 */
 	protected ArrayList<String> tokenize(String text)
 	{		
-		// P2: done?
+		// P2
 		//With the following regexp we will keep also non-latin alphabetic words:
 		String[] strings = text.replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", " ").split("\\s+");
 		ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(strings));		
@@ -155,6 +156,7 @@ public class HtmlProcessor implements DocumentProcessor
 	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
 	}  
 
+	
 	/**
 	 * Checks whether the given term is a stopword.
 	 *
@@ -182,9 +184,12 @@ public class HtmlProcessor implements DocumentProcessor
 	protected String stem(String term)
 	{
 		String stem = null;
-
+		
 		// P2
-		// use the stemmer java provided in the aulaglobal, or use another one if you want
+		Stemmer stemmer = new Stemmer();
+		stemmer.add(term.toCharArray(), term.length());;
+		stemmer.stem();
+		stem = stemmer.toString();
 
 		return stem;
 	}
