@@ -97,6 +97,10 @@ public class HtmlProcessor implements DocumentProcessor
 		System.out.println(stopWordsRemoved); 
 		*/
 		
+		System.out.println("\n log process:");
+		System.out.println(tokens);
+		System.out.println(tokensNorm);
+		System.out.println(stopWordsRemoved);
 		
 		
 		//TODO:stemming
@@ -115,8 +119,9 @@ public class HtmlProcessor implements DocumentProcessor
 	 */
 	protected ArrayList<String> tokenize(String text)
 	{		
-		// P2: done?	
-		String[] strings = text.replaceAll("[^A-Za-z0-9]", " ").split("\\s+");
+		// P2: done?
+		//With the following regexp we will keep also non-latin alphabetic words:
+		String[] strings = text.replaceAll("[^\\p{IsAlphabetic}^\\p{IsDigit}]", " ").split("\\s+");
 		ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(strings));		
 
 		return tokens;
@@ -131,7 +136,6 @@ public class HtmlProcessor implements DocumentProcessor
 	protected String normalize(String text)
 	{
 		// P2: done?
-		//TODO: not sure if this is really correct
 		String normalized = null;
 		if(!isNumeric(text)) {
 			String textLower = text.toLowerCase();
