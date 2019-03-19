@@ -80,7 +80,8 @@ public class SearchEngine
         ind.printStatistics();
 
         // Instantiate retriever and run
-        DocumentProcessor docProcessor = new HtmlProcessor(null); // P3
+        //DocumentProcessor docProcessor = new HtmlProcessor(null); // P3
+        DocumentProcessor docProcessor = new SimpleProcessor(); // P3
         RetrievalModel cosine = new Cosine(); // P4
         Batch batch = new Batch(pathToQueries, cosine, ind, docProcessor);
         batch.run();

@@ -38,9 +38,12 @@ public class HtmlProcessor implements DocumentProcessor
 	public HtmlProcessor(File pathToStopWords) throws IOException
 	{
 		// P2
-		//TODO: shall we normalize the stopwords as well??
-		List<String> lines = Files.readAllLines(Paths.get(pathToStopWords.toString()), StandardCharsets.UTF_8);
-		this.stopwords = new HashSet<String>(lines);		
+		//TODO: ¿shall we normalize the stopwords as well??
+		if(pathToStopWords != null) {
+			List<String> lines = Files.readAllLines(Paths.get(pathToStopWords.toString()), StandardCharsets.UTF_8);
+			this.stopwords = new HashSet<String>(lines);
+		} 
+	
 	}
 
 	/**
@@ -167,8 +170,8 @@ public class HtmlProcessor implements DocumentProcessor
 	{
 		boolean isTopWord = false;
 
-		// P2: done?
-		if(this.stopwords.contains(term)) {
+		// P2: done
+		if(this.stopwords != null && this.stopwords.contains(term)) {
 			isTopWord = true;
 		}
 

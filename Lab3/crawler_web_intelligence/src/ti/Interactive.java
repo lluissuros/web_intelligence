@@ -48,6 +48,7 @@ public class Interactive
 
 			if (!input.isEmpty()) {
 				ArrayList<Tuple<Integer, Double>> results = this.model.runQuery(input, this.index, this.docProcessor);
+				System.out.println(input);
 				this.printResults(input, results, 0, 10);
 			}
 		} while (!input.isEmpty());
